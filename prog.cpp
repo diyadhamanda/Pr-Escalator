@@ -2,93 +2,101 @@
 
 #include <iostream>
 using namespace std;
-class Stack
+
+template <typename T>
+class BaseStack
 {
 public:
-    int *arr;
+    T *arr;
     int Top;
     int capacity;
-    int size;
 
-    Stack(int capacity)
+    BaseStack(int capacity)
     {
         this->capacity = capacity;
         this->arr = new int[this->capacity];
         this->Top = -1;
     }
 
-    ~Stack()
+    virtual ~BaseStack()
     {
         delete[] arr;
     }
 
-    void push(int element);
-    int pop();
-    int top();
-    bool isEmpty();
-    bool isFull();
-    void display();
+    virtual void push(int element) = 0;
+    virtual T pop() = 0;
+    virtual T top() = 0;
+    virtual bool isEmpty() = 0;
+    virtual bool isFull() = 0;
+    virtual void display() = 0;
 };
 
-bool Stack::isEmpty()
+template <typename T>
+class ChildStack : public BaseStack<T>
 {
-    return this->Top == -1;
-}
+public:
+    ChildStack(int size) : BaseStack<T>(size) {}
 
-bool Stack::isFull()
-{
-    return this->Top == capacity - 1;
-}
+    bool isEmpty()
+    {
+        return this->Top == -1;
+    }
 
-void Stack::push(int element)
-{
-    if (this->isFull())
+    bool isFull()
     {
-        cout << "Stack Overflow" << endl;
-        return;
+        return this->Top == this->capacity - 1;
     }
-    else
-    {
-        this->Top++;
-        this->arr[this->Top] = element;
-    }
-}
 
-int Stack::pop()
-{
-    if (this->isEmpty())
+    void push(T element)
     {
-        cout << "Stack Overflow" << endl;
-        return -1;
+        if (this->isFull())
+        {
+            cout << "Stack Overflow" << endl;
+            return;
+        }
+        else
+        {
+            this->Top++;
+            this->arr[this->Top] = element;
+        }
     }
-    else
-    {
-        return arr[Top--];
-    }
-}
 
-int Stack::top()
-{
-    if (this->isEmpty())
+    T pop()
     {
-        cout << "Stack is empty" << endl;
-        return -1;
+        if (this->isEmpty())
+        {
+            cout << "Stack Overflow" << endl;
+            return T();
+        }
+        else
+        {
+            return this->arr[this->Top--];
+        }
     }
-    else
-    {
-        return arr[Top];
-    }
-}
 
-void Stack::display()
-{
-    cout << "Stack elements: ";
-    for (int i = 0; i <= Top; i++)
+    T top()
     {
-        cout << arr[i] << " ";
+        if (this->isEmpty())
+        {
+            cout << "Stack is empty" << endl;
+            return T();
+        }
+        else
+        {
+            return this->arr[this->Top];
+        }
     }
-    cout << endl;
-}
+
+    void display()
+    {
+        cout << "Stack elements: ";
+        for (int i = 0; i <= this->Top; i++)
+        {
+            cout << this->arr[i] << " ";
+        }
+        cout << endl;
+    }
+};
 
 int main()
 {
@@ -97,7 +105,7 @@ int main()
     cout << "Enter the size of an Arrary: ";
     cin >> size;
 
-    Stack s(size);
+   ChildStack<int> s(size);
 
     do
     {
